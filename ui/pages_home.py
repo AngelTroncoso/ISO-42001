@@ -78,21 +78,21 @@ def render_home_page():
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        if st.button("📚 Consultar Norma", use_container_width=True):
+        if st.button("📚 Consultar Norma", width="stretch"):
             st.session_state['page'] = 'search'
             st.rerun()
     
     with col2:
-        if st.button("📊 Ver Seguimiento", use_container_width=True):
+        if st.button("📊 Ver Seguimiento", width="stretch"):
             st.session_state['page'] = 'tracker'
             st.rerun()
     
     with col3:
-        if st.button("💬 Hablar con Asesor", use_container_width=True):
+        if st.button("💬 Hablar con Asesor", width="stretch"):
             st.session_state['page'] = 'advisor'
             st.rerun()
     
     with col4:
-        if st.button("📖 Biblioteca", use_container_width=True):
+        if st.button("📖 Biblioteca", width="stretch"):
             st.session_state['page'] = 'library'
             st.rerun()

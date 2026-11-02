@@ -1,5 +1,6 @@
 """RAG (Retrieval Augmented Generation) engine using LlamaIndex and Mistral AI."""
 import logging
+import time
 from pathlib import Path
 from typing import Optional
 from llama_index.core import (
@@ -17,6 +18,46 @@ from core.clause_parser import detect_clause
 
 
 logger = logging.getLogger(__name__)
+
+
+def _is_rate_limit_error(error: Exception) -> bool:
+    """Check if error is a rate limit error.
+    
+    Args:
+        error: Exception to check
+        
+    Returns:
+        True if rate limit error
+    """
+    error_str = str(error).lower()
+    return '429' in error_str or 'rate_limit' in error_str or 'rate limit' in error_str
+
+
+def _retry_with_backoff(func, max_retries: int = 3):
+    """Retry function with exponential backoff for rate limit errors.
+    
+    Args:
+        func: Function to retry
+        max_retries: Maximum number of retries
+        
+    Returns:
+        Function result
+        
+    Raises:
+        Exception if all retries fail
+    """
+    wait_times = [2, 5, 10]
+    
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception as e:
+            if _is_rate_limit_error(e) and attempt < max_retries - 1:
+                wait_time = wait_times[attempt]
+                logger.warning(f"Rate limit hit, waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
+                time.sleep(wait_time)
+            else:
+                raise
 
 
 class RAGEngine:
@@ -96,11 +137,14 @@ class RAGEngine:
                 )
                 documents.append(doc)
             
-            # Create index
-            self.index = VectorStoreIndex.from_documents(
-                documents,
-                show_progress=True
-            )
+            # Create index with retry logic for embeddings
+            def create_index():
+                return VectorStoreIndex.from_documents(
+                    documents,
+                    show_progress=True
+                )
+            
+            self.index = _retry_with_backoff(create_index)
             
             self.documents_loaded.append(pdf_path.name)
             
@@ -111,20 +155,22 @@ class RAGEngine:
             return len(documents)
             
         except Exception as e:
+            if _is_rate_limit_error(e):
+                raise Exception("Se alcanzó el límite de uso de Mistral AI. Espera un minuto e inténtalo de nuevo.")
             logger.error(f"Error loading PDF: {e}")
             raise
     
     def query(
         self,
         question: str,
-        top_k: int = 5,
+        top_k: int = 3,
         similarity_threshold: float = 0.5
     ) -> dict[str, any]:
         """Query the indexed documents.
         
         Args:
             question: User question
-            top_k: Number of relevant chunks to retrieve
+            top_k: Number of relevant chunks to retrieve (default: 3)
             similarity_threshold: Minimum similarity score
             
         Returns:
@@ -144,8 +190,11 @@ class RAGEngine:
                 response_mode='compact'
             )
             
-            # Execute query
-            response = query_engine.query(question)
+            # Execute query with retry logic
+            def execute_query():
+                return query_engine.query(question)
+            
+            response = _retry_with_backoff(execute_query)
             
             # Extract sources with citations
             sources = []
@@ -171,10 +220,18 @@ class RAGEngine:
             
         except Exception as e:
             logger.error(f"Error during query: {e}")
+            
+            if _is_rate_limit_error(e):
+                return {
+                    'answer': '',
+                    'sources': [],
+                    'error': 'Se alcanzó el límite de uso de Mistral AI. Espera un minuto e inténtalo de nuevo.'
+                }
+            
             return {
-                'answer': f'Error al procesar la consulta: {str(e)}',
+                'answer': '',
                 'sources': [],
-                'error': str(e)
+                'error': 'Error al procesar la consulta. Inténtalo de nuevo.'
             }
     
     def get_index_stats(self) -> dict[str, any]:

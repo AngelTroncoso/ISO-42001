@@ -43,7 +43,7 @@ def render_advisor_page():
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("📍 ¿Por dónde empiezo?", use_container_width=True):
+        if st.button("📍 ¿Por dónde empiezo?", width="stretch"):
             response = agent.get_quick_response('start')
             st.session_state.chat_history.append({
                 'role': 'user',
@@ -55,7 +55,7 @@ def render_advisor_page():
             })
             st.rerun()
         
-        if st.button("📋 ¿Qué documentos necesito?", use_container_width=True):
+        if st.button("📋 ¿Qué documentos necesito?", width="stretch"):
             response = agent.get_quick_response('documents')
             st.session_state.chat_history.append({
                 'role': 'user',
@@ -68,7 +68,7 @@ def render_advisor_page():
             st.rerun()
     
     with col2:
-        if st.button("⚠️ Ayúdame con análisis de riesgos", use_container_width=True):
+        if st.button("⚠️ Ayúdame con análisis de riesgos", width="stretch"):
             response = agent.get_quick_response('risk_analysis')
             st.session_state.chat_history.append({
                 'role': 'user',
@@ -80,7 +80,7 @@ def render_advisor_page():
             })
             st.rerun()
         
-        if st.button("✅ Prepárame para auditoría", use_container_width=True):
+        if st.button("✅ Prepárame para auditoría", width="stretch"):
             response = agent.get_quick_response('audit')
             st.session_state.chat_history.append({
                 'role': 'user',
@@ -148,7 +148,7 @@ def render_advisor_page():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("🗑️ Limpiar conversación", use_container_width=True):
+        if st.button("🗑️ Limpiar conversación", width="stretch"):
             st.session_state.chat_history = []
             agent.reset_conversation()
             st.rerun()
@@ -169,7 +169,7 @@ def render_advisor_page():
                 data=export_text,
                 file_name="conversacion_iso42001.txt",
                 mime="text/plain",
-                use_container_width=True
+                width="stretch"
             )
     
     # Tips

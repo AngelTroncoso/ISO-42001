@@ -165,15 +165,23 @@ Ejecuta todos los tests con:
 pytest tests\ -v
 ```
 
-**Tests implementados**: 35 tests
+**Tests implementados**: 49 tests
 
 - **test_clause_parser.py**: 12 tests de detección de cláusulas (4.1, 6.1.2, A.2.2, B.6.2.4)
 - **test_compliance_tracker.py**: 8 tests de cálculo de métricas y progreso
 - **test_database.py**: 12 tests de operaciones CRUD en SQLite
-- **test_pdf_loader.py**: 2 tests de validación de PDFs
+- **test_pdf_loader.py**: 14 tests de validación y reparación de PDFs (incluyendo EOF markers)
 - **test_rag_persistence.py**: 3 tests de guardado y carga de índices
 
 Todos los tests deben pasar. Si alguno falla, revisa la configuración.
+
+### ⚠️ Solución de Problemas Comunes
+
+**Error 429 de Mistral AI**:
+- **Causa**: Has alcanzado el límite de llamadas a la API de Mistral (límite gratuito)
+- **Solución temporal**: Espera unos minutos antes de hacer nuevas consultas
+- **Solución permanente**: Actualiza a un plan de pago en https://console.mistral.ai/
+- **Nota**: El sistema reintenta automáticamente hasta 3 veces con espera incremental (2s, 5s, 10s)
 
 ## 📁 Estructura del Proyecto
 
@@ -212,7 +220,7 @@ iso-42001-compliance/
 ├── utils/
 │   └── helpers.py                  # Funciones auxiliares
 │
-└── tests/                          # Tests unitarios (35 tests)
+└── tests/                          # Tests unitarios (49 tests)
     ├── test_clause_parser.py
     ├── test_compliance_tracker.py
     ├── test_database.py
@@ -224,7 +232,7 @@ iso-42001-compliance/
 
 | Componente | Tecnología | Versión |
 |------------|------------|---------|
-| Framework UI | Streamlit | >=1.29,<2 |
+| Framework UI | Streamlit | >=1.45,<2 |
 | RAG Framework | LlamaIndex Core | >=0.10,<0.13 |
 | LLM | Mistral AI | mistral-small-latest |
 | Embeddings | Mistral Embed | mistral-embed |

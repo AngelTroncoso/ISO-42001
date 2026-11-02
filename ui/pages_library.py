@@ -61,7 +61,7 @@ def render_library_page():
         col1, col2 = st.columns([1, 3])
         
         with col1:
-            load_button = st.button("🚀 Cargar y Procesar", type="primary", use_container_width=True)
+            load_button = st.button("🚀 Cargar y Procesar", type="primary", width="stretch")
         
         if load_button:
             # Save uploaded file temporarily

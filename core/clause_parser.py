@@ -77,7 +77,9 @@ def extract_clauses_from_text(text: str) -> list[str]:
     """
     clauses = set()
     
-    for match in CLAUSE_PATTERN.finditer(text):
+    # Use MULTILINE to search across entire text
+    pattern = re.compile(r'((?:[A-C]\.)?\d+(?:\.\d+)*)\b')
+    for match in pattern.finditer(text):
         clause = match.group(1)
         if is_valid_clause(clause):
             clauses.add(clause)

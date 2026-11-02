@@ -129,7 +129,7 @@ def render_requirements_list(db: ComplianceDatabase, df: pd.DataFrame):
             filtered_df,
             column_config=column_config,
             hide_index=True,
-            use_container_width=True,
+            width="stretch",
             num_rows="fixed",
             disabled=['id', 'clause', 'requirement', 'created_at', 'updated_at']
         )
@@ -219,7 +219,7 @@ def render_analysis(df: pd.DataFrame):
             st.dataframe(
                 overdue[['clause', 'requirement', 'estado', 'fecha_objetivo', 'responsable']],
                 hide_index=True,
-                use_container_width=True
+                width="stretch"
             )
         else:
             st.success("✅ No hay requisitos vencidos")
@@ -231,7 +231,7 @@ def render_analysis(df: pd.DataFrame):
             st.dataframe(
                 upcoming[['clause', 'requirement', 'estado', 'fecha_objetivo', 'responsable']],
                 hide_index=True,
-                use_container_width=True
+                width="stretch"
             )
         else:
             st.info("No hay requisitos próximos en los siguientes 30 días")
@@ -249,7 +249,7 @@ def render_management(db: ComplianceDatabase, df: pd.DataFrame):
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("📊 Exportar a Excel", use_container_width=True):
+        if st.button("📊 Exportar a Excel", width="stretch"):
             export_path = f"compliance_export_{date.today().isoformat()}.xlsx"
             if ComplianceTracker.export_to_excel(df, export_path):
                 with open(export_path, 'rb') as f:
@@ -261,7 +261,7 @@ def render_management(db: ComplianceDatabase, df: pd.DataFrame):
                     )
     
     with col2:
-        if st.button("📄 Exportar a CSV", use_container_width=True):
+        if st.button("📄 Exportar a CSV", width="stretch"):
             export_path = f"compliance_export_{date.today().isoformat()}.csv"
             if ComplianceTracker.export_to_csv(df, export_path):
                 with open(export_path, 'rb') as f:
