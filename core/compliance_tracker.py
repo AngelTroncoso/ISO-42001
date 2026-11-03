@@ -104,8 +104,8 @@ class ComplianceTracker:
         if df.empty or 'fecha_objetivo' not in df.columns:
             return pd.DataFrame()
 
-        reference = pd.Timestamp(today or date.today())
-        limit = reference + pd.Timedelta(days=days)
+        reference = timestamp(today or date.today())
+        limit = reference + timedelta(days=days)
         targets = pd.to_datetime(df['fecha_objetivo'], errors='coerce').dt.normalize()
 
         mask = (
